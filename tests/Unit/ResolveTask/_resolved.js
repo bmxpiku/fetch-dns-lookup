@@ -21,7 +21,7 @@ describe('Unit: ResolveTask::_resolved', () => {
         onDoneSpy = sinon.spy();
     });
 
-    it(`must correct call callbacks with appropriate error object, IPv${ipVersion} version`, done => {
+    it(`must correct call callbacks with appropriate error object, IPv${ipVersion} version`, async () => {
         const expectedError = error;
         const expectedAddresses = undefined;
 
@@ -33,9 +33,17 @@ describe('Unit: ResolveTask::_resolved', () => {
         const resolvedCallback = sinon.spy();
 
         task._callbacks.push(resolvedCallback);
+        const resolverStub = sinon.stub(
+            task,
+            '_resolver'
+        );
+        resolverStub.onCall(0).returns(
+            new Promise((resolve, reject) => {
+                reject(error);
+            })
+        );
 
-        task._resolved(error);
-
+        await task.run();
         assert.isTrue(onDoneSpy.calledOnce);
         assert.isTrue(onDoneSpy.calledWithExactly());
 
@@ -51,12 +59,10 @@ describe('Unit: ResolveTask::_resolved', () => {
             );
 
             assert.isTrue(onAddressesSpy.notCalled);
-
-            done();
         });
     });
 
-    it(`must correct emit all events and run callbacks for IPv${ipVersion}`, done => {
+    it(`must correct emit all events and run callbacks for IPv${ipVersion}`, async () => {
         const task = new ResolveTask(hostname, ipVersion);
 
         task.on('addresses', onAddressesSpy);
@@ -67,7 +73,17 @@ describe('Unit: ResolveTask::_resolved', () => {
 
         task._callbacks.push(resolvedCallback);
 
-        task._resolved(null, addresses);
+        const resolverStub = sinon.stub(
+            task,
+            '_resolver'
+        );
+        resolverStub.onCall(0).returns(
+            new Promise((resolve, reject) => {
+                resolve(addresses);
+            })
+        );
+
+        await task.run();
 
         assert.isTrue(onAddressesSpy.calledOnce);
         assert.isTrue(onAddressesSpy.calledWithExactly(addresses));
@@ -80,8 +96,6 @@ describe('Unit: ResolveTask::_resolved', () => {
         setImmediate(() => {
             assert.isTrue(resolvedCallback.calledOnce);
             assert.isTrue(resolvedCallback.calledWithExactly(null, addresses));
-
-            done();
         });
     });
 });

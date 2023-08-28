@@ -4,17 +4,19 @@
 ## Super simple to use
 
 ```js
-const request = require('request');
-const {lookup} = require('lookup-dns-cache');
+import fetch from 'node-fetch';
+import { lookup } from 'lookup-dns-cache';
 
-// With "request" module
+// With "node-fetch" module
+const staticDnsAgent = () => new https.Agent({
+    lookup: lookup,
+    // keep alive defaults to true for node >=18, this setting is for 16
+    keepAlive: true,
+});
 
-request({
-    url: 'http://google.com',
-    method: 'GET',
-    lookup: lookup
-}, (error, response, body) => {
-    // ...
+const response = await fetch(uri, {
+    method,
+    agent: staticDnsAgent,
 });
 
 // Direct usage
@@ -37,6 +39,10 @@ lookup('google.com', {}, (error, address, family) => {
 
 The main idea behind this package is eliminate NodeJS event loop usage when you do network request.
 See [NodeJS DNS implementation](https://nodejs.org/api/dns.html#dns_implementation_considerations) to understand the problem with `dns.lookup`.
+
+Valuable reads: 
+ - https://httptoolkit.com/blog/configuring-nodejs-dns/
+ - https://www.npmjs.com/package/tangerine
 
 
 [back to top](#table-of-contents)

@@ -9,10 +9,8 @@
  */
 
 const assert = require('assert');
-const dns = require('dns');
+const Tangerine = require('tangerine');
 const { EventEmitter } = require('events');
-
-const _ = require('lodash');
 
 class ResolveTask extends EventEmitter {
     /**
@@ -37,7 +35,7 @@ class ResolveTask extends EventEmitter {
         super();
 
         assert(
-            _.isString(hostname) && hostname.length > 0,
+            typeof hostname === 'string' && hostname.length > 0,
             `hostname must be not empty string, '${hostname}' has been provided.`
         );
 
@@ -49,10 +47,11 @@ class ResolveTask extends EventEmitter {
         this._callbacks = [];
         this._hostname = hostname;
         this._ipVersion = ipVersion;
+        const resolver = new Tangerine();
         this._resolver =
-            ipVersion === ResolveTask.IPv4 ? dns.resolve4 : dns.resolve6;
+            ipVersion === ResolveTask.IPv4 ? resolver.resolve4 : resolver.resolve6;
 
-        this._resolved = this._resolved.bind(this);
+        // this._resolved = this._resolved.bind(this);
     }
 
     /**
@@ -62,18 +61,14 @@ class ResolveTask extends EventEmitter {
         this._callbacks.push(callback);
     }
 
-    run() {
-        this._resolver(this._hostname, { ttl: true }, this._resolved);
-    }
-
-    /**
-     * @param {Error} error
-     * @param {Address[]} addresses
-     * @emits ResolveTask#addresses array of addresses
-     * @emits ResolveTask#done notification about completion
-     * @private
-     */
-    _resolved(error, addresses) {
+    async run() {
+        let error = null;
+        let addresses;
+        try {
+            addresses = await this._resolver(this._hostname, { ttl: true, cache: true });
+        } catch (err) {
+            error = err;
+        }
         assert(this._callbacks.length > 0, 'callbacks array cannot be empty.');
 
         if (!error) {
@@ -95,6 +90,36 @@ class ResolveTask extends EventEmitter {
 
         this.emit('done');
     }
+
+    /**
+     * @param {Error} error
+     * @param {Address[]} addresses
+     * @emits ResolveTask#addresses array of addresses
+     * @emits ResolveTask#done notification about completion
+     * @private
+     */
+    // _resolved(error, addresses) {
+    //     assert(this._callbacks.length > 0, 'callbacks array cannot be empty.');
+    //
+    //     if (!error) {
+    //         assert(Array.isArray(addresses), 'addresses must be an array.');
+    //
+    //         addresses.forEach(address => {
+    //             address.family = this._ipVersion;
+    //             address.expiredTime = Date.now() + address.ttl * 1000;
+    //         });
+    //
+    //         this.emit('addresses', addresses);
+    //     }
+    //
+    //     this._callbacks.forEach(callback => {
+    //         setImmediate(() => callback(error, addresses));
+    //     });
+    //
+    //     this._callbacks = [];
+    //
+    //     this.emit('done');
+    // }
 }
 
 module.exports = ResolveTask;

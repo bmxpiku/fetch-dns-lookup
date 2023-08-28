@@ -30,10 +30,10 @@ describe("must correct process 'hostname' param", () => {
         lookup(addresses.INVALID_HOST, error => {
             assert.instanceOf(error, Error);
             assert.strictEqual(error.hostname, addresses.INVALID_HOST);
-            assert.strictEqual(error.code, dns.SERVFAIL);
+            assert.strictEqual(error.code, dns.NOTFOUND);
             assert.match(
                 error.message,
-                new RegExp(`${dns.SERVFAIL} ${addresses.INVALID_HOST}`)
+                new RegExp(`${dns.NOTFOUND} ${addresses.INVALID_HOST}`)
             );
 
             done();

@@ -53,33 +53,35 @@ describe('Unit: Lookup::_resolveTaskBuilder', () => {
         assert.isEmpty(resolveTask);
     });
 
-    it("must return function that calls '_resolve' under the hood and in case error calls callback with an error", async () => {
-        const error = new Error('some error');
+    it("must return function that calls '_resolve' under the hood and in case error calls callback with an error",
+        async () => {
+            const error = new Error('some error');
 
-        const resolveSpy = sinon
-            .stub(lookup, '_resolve')
-            .callsFake((hostname, options, cb) => {
-                assert.strictEqual(resolveSpy.getCall(0).args[0], hostname);
-                assert.strictEqual(resolveSpy.getCall(0).args[1], options);
+            const resolveSpy = sinon
+                .stub(lookup, '_resolve')
+                .callsFake((hostname, options, cb) => {
+                    assert.strictEqual(resolveSpy.getCall(0).args[0], hostname);
+                    assert.strictEqual(resolveSpy.getCall(0).args[1], options);
 
-                cb(error);
-            });
+                    cb(error);
+                });
 
-        await lookup._resolveTaskBuilder(hostname, options)
-            .then(function (m) {
-                throw new Error('was not supposed to succeed');
-            })
-            .catch(function (m) {
-                expect(m).to.equal(error);
-            });
+            await lookup._resolveTaskBuilder(hostname, options)
+                .then(function (m) {
+                    throw new Error('was not supposed to succeed');
+                })
+                .catch(function (m) {
+                    expect(m).to.equal(error);
+                });
 
-        assert.isTrue(resolveSpy.calledOnce);
-        assert.strictEqual(resolveSpy.getCall(0).args[0], hostname);
-        assert.strictEqual(resolveSpy.getCall(0).args[1], options);
-        assert.instanceOf(resolveSpy.getCall(0).args[2], Function);
-    });
+            assert.isTrue(resolveSpy.calledOnce);
+            assert.strictEqual(resolveSpy.getCall(0).args[0], hostname);
+            assert.strictEqual(resolveSpy.getCall(0).args[1], options);
+            assert.instanceOf(resolveSpy.getCall(0).args[2], Function);
+        });
 
-    it("must return function that calls '_resolve' under the hood and in case no error calls callback with results", async () => {
+    it("must return function that calls '_resolve' under the" +
+        'hood and in case no error calls callback with results', async () => {
         const error = null;
         const results = [Symbol(), Symbol()];
 

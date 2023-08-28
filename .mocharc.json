@@ -1,0 +1,6 @@
+{
+  "slow": 50,
+  "checkLeaks": true,
+  "recursive": true
+
+}

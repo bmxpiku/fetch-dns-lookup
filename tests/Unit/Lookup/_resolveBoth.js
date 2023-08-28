@@ -2,7 +2,6 @@
 
 const dns = require('dns');
 
-const async = require('async');
 const { assert } = require('chai');
 const sinon = require('sinon');
 

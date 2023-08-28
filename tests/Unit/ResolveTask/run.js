@@ -23,8 +23,7 @@ describe('Unit: ResolveTask::run', () => {
         assert.isTrue(
             resolverSpy.calledWithExactly(
                 hostname,
-                { ttl: true },
-                task._resolved
+                { ttl: true, cache: true },
             )
         );
     });

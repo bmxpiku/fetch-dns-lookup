@@ -2,13 +2,12 @@
 
 const dns = require('dns');
 
-const _ = require('lodash');
-const async = require('async');
 const rr = require('rr');
 
 const AddressCache = require('./AddressCache');
 const TasksManager = require('./TasksManager');
 const ResolveTask = require('./ResolveTask');
+const { isPlainObj } = require('./utils');
 
 class Lookup {
     /**
@@ -51,18 +50,18 @@ class Lookup {
      * @returns {{}|undefined}
      */
     run(hostname, options, callback) {
-        if (_.isFunction(options)) {
+        if (typeof options === 'function') {
             callback = options;
             options = {};
-        } else if (_.isNumber(options)) {
+        } else if (typeof options === 'number') {
             options = { family: options };
-        } else if (!_.isPlainObject(options)) {
+        } else if (!isPlainObj(options)) {
             throw new Error(
                 'options must be an object or an ip version number'
             );
         }
 
-        if (!_.isFunction(callback)) {
+        if (typeof callback !== 'function') {
             throw new Error('callback param must be a function');
         }
 
@@ -81,7 +80,7 @@ class Lookup {
             return {};
         }
 
-        if (!_.isString(hostname)) {
+        if (typeof hostname !== 'string') {
             throw new Error('hostname must be a string');
         }
 
@@ -162,7 +161,7 @@ class Lookup {
 
                 return callback(null, result);
             } else {
-                if (_.isEmpty(records)) {
+                if (!records.length) {
                     const error = this._makeNotFoundError(
                         hostname,
                         options.family === 4 ? 'queryA' : 'queryAaaa'
@@ -243,14 +242,14 @@ class Lookup {
             if (options.all) {
                 const result = ipv4records.concat(ipv6records);
 
-                if (_.isEmpty(result)) {
+                if (!result.length) {
                     return callback(this._makeNotFoundError(hostname));
                 }
 
                 return callback(null, result);
-            } else if (!_.isEmpty(ipv4records)) {
+            } else if (ipv4records.length > 0) {
                 return callback(null, ...ipv4records);
-            } else if (!_.isEmpty(ipv6records)) {
+            } else if (ipv6records.length > 0) {
                 return callback(null, ...ipv6records);
             }
 

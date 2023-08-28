@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 class AddressCache {
     constructor() {
         this._cache = new Map();
@@ -39,7 +37,7 @@ class AddressCache {
      * @private
      */
     _isExpired(addresses) {
-        if (_.isEmpty(addresses)) {
+        if (!addresses.length) {
             return true;
         }
 
