@@ -227,9 +227,9 @@ class Lookup {
      * @param {Function} callback
      * @private
      */
-    _resolveBoth(hostname, options, callback) {
-        async.parallel(
-            [
+    async _resolveBoth(hostname, options, callback) {
+        try {
+            const [ipv4records, ipv6records] = await Promise.all([
                 this._resolveTaskBuilder(
                     hostname,
                     Object.assign({}, options, { family: Lookup.IPv4 })
@@ -238,31 +238,26 @@ class Lookup {
                     hostname,
                     Object.assign({}, options, { family: Lookup.IPv6 })
                 )
-            ],
-            (error, records) => {
-                if (error) {
-                    return callback(error);
+            ]);
+
+            if (options.all) {
+                const result = ipv4records.concat(ipv6records);
+
+                if (_.isEmpty(result)) {
+                    return callback(this._makeNotFoundError(hostname));
                 }
 
-                const [ipv4records, ipv6records] = records;
-
-                if (options.all) {
-                    const result = ipv4records.concat(ipv6records);
-
-                    if (_.isEmpty(result)) {
-                        return callback(this._makeNotFoundError(hostname));
-                    }
-
-                    return callback(null, result);
-                } else if (!_.isEmpty(ipv4records)) {
-                    return callback(null, ...ipv4records);
-                } else if (!_.isEmpty(ipv6records)) {
-                    return callback(null, ...ipv6records);
-                }
-
-                return callback(this._makeNotFoundError(hostname));
+                return callback(null, result);
+            } else if (!_.isEmpty(ipv4records)) {
+                return callback(null, ...ipv4records);
+            } else if (!_.isEmpty(ipv6records)) {
+                return callback(null, ...ipv6records);
             }
-        );
+
+            return callback(this._makeNotFoundError(hostname));
+        } catch (errors) {
+            return callback(errors);
+        }
     }
 
     /**
@@ -271,20 +266,20 @@ class Lookup {
      * @returns {Function}
      * @private
      */
-    _resolveTaskBuilder(hostname, options) {
-        return cb => {
+    async _resolveTaskBuilder(hostname, options) {
+        return new Promise((resolve, reject) => {
             this._resolve(hostname, options, (error, ...records) => {
                 if (error) {
                     if (error.code === dns.NOTFOUND) {
-                        return cb(null, []);
+                        return resolve([]);
                     }
 
-                    return cb(error);
+                    return reject(error);
                 }
 
-                cb(null, ...records);
+                resolve(...records);
             });
-        };
+        });
     }
 
     // noinspection JSMethodCanBeStatic

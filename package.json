@@ -9,7 +9,7 @@
   "scripts": {
     "prettier": "./node_modules/.bin/prettier --single-quote --tab-width 4 --write \"**/*.js\"",
     "lint": "./node_modules/.bin/eslint ./",
-    "test": "yarn run unit-test && yarn run func-test",
+    "test": "npm run unit-test && npm run func-test",
     "unit-test": "NODE_ENV=test ./node_modules/.bin/mocha --opts tests/mocha.opts -R spec ./tests/Unit/**",
     "func-test": "NODE_ENV=test ./node_modules/.bin/mocha --opts tests/mocha.opts --timeout 15000 -R spec ./tests/Functional/**",
     "test:coverage": "NODE_ENV=test ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --print both -- --opts tests/mocha.opts -R spec ./tests"
@@ -17,7 +17,9 @@
   "dependencies": {
     "async": "2.6.0",
     "lodash": "^4.17.10",
-    "rr": "0.1.0"
+    "rr": "0.1.0",
+    "tangerine": "^1.5.4",
+    "undici": "^5.23.0"
   },
   "devDependencies": {
     "chai": "4.1.2",
@@ -26,7 +28,8 @@
     "mocha": "4.1.0",
     "prettier": "1.9.2",
     "proxyquire": "1.8.0",
-    "sinon": "4.1.4"
+    "sinon": "4.1.4",
+    "typescript": "^5.2.2"
   },
   "author": {
     "name": "Eduard",

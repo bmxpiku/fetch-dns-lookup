@@ -27,11 +27,11 @@ describe('Unit: Lookup::_resolveBoth', () => {
                 return cb => {};
             });
 
-        const asyncParallelSpy = sinon.spy(async, 'parallel');
+        // const asyncParallelSpy = sinon.spy(async, 'parallel');
 
         lookup._resolveBoth(hostname, options);
 
-        assert.isTrue(asyncParallelSpy.calledOnce);
+        // assert.isTrue(asyncParallelSpy.calledOnce);
         assert.isTrue(resolveTaskBuilderStub.calledTwice);
 
         assert.strictEqual(resolveTaskBuilderStub.getCall(0).args[0], hostname);
@@ -57,16 +57,8 @@ describe('Unit: Lookup::_resolveBoth', () => {
             lookup,
             '_resolveTaskBuilder'
         );
-        resolveTaskBuilderStub.onCall(0).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(error);
-                });
-            };
-        });
-        resolveTaskBuilderStub.onCall(1).callsFake(() => {
-            return cb => {};
-        });
+        resolveTaskBuilderStub.onCall(0).rejects(error);
+        resolveTaskBuilderStub.onCall(1).resolves([]);
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
@@ -115,16 +107,8 @@ describe('Unit: Lookup::_resolveBoth', () => {
             lookup,
             '_resolveTaskBuilder'
         );
-        resolveTaskBuilderStub.onCall(0).callsFake(() => {
-            return cb => {};
-        });
-        resolveTaskBuilderStub.onCall(1).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(error);
-                });
-            };
-        });
+        resolveTaskBuilderStub.onCall(0).resolves([]);
+        resolveTaskBuilderStub.onCall(1).rejects(error);
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
@@ -178,13 +162,7 @@ describe('Unit: Lookup::_resolveBoth', () => {
 
             const resolveTaskBuilderStub = sinon
                 .stub(lookup, '_resolveTaskBuilder')
-                .callsFake(() => {
-                    return cb => {
-                        setImmediate(() => {
-                            cb(null, []);
-                        });
-                    };
-                });
+                .resolves([]);
 
             const makeNotFoundErrorSpy = sinon.spy(
                 lookup,
@@ -260,21 +238,21 @@ describe('Unit: Lookup::_resolveBoth', () => {
             lookup,
             '_resolveTaskBuilder'
         );
-        resolveTaskBuilderStub.onCall(0).callsFake(() => {
-            return cb => {
+        resolveTaskBuilderStub.onCall(0).returns(
+            new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    cb(null, ipv4records);
+                    resolve(ipv4records);
                 }, 20);
-            };
-        });
+            })
+        );
 
-        resolveTaskBuilderStub.onCall(1).callsFake(() => {
-            return cb => {
+        resolveTaskBuilderStub.onCall(1).returns(
+            new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    cb(null, ipv6records);
+                    resolve(ipv6records);
                 }, 10);
-            };
-        });
+            })
+        );
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
@@ -329,21 +307,9 @@ describe('Unit: Lookup::_resolveBoth', () => {
             lookup,
             '_resolveTaskBuilder'
         );
-        resolveTaskBuilderStub.onCall(0).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(null, ipv4records);
-                });
-            };
-        });
+        resolveTaskBuilderStub.onCall(0).resolves(ipv4records);
 
-        resolveTaskBuilderStub.onCall(1).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(null, ipv6records);
-                });
-            };
-        });
+        resolveTaskBuilderStub.onCall(1).resolves(ipv6records);
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
@@ -395,21 +361,9 @@ describe('Unit: Lookup::_resolveBoth', () => {
             lookup,
             '_resolveTaskBuilder'
         );
-        resolveTaskBuilderStub.onCall(0).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(null, ipv4records);
-                });
-            };
-        });
+        resolveTaskBuilderStub.onCall(0).resolves(ipv4records);
 
-        resolveTaskBuilderStub.onCall(1).callsFake(() => {
-            return cb => {
-                setImmediate(() => {
-                    cb(null, ipv6records);
-                });
-            };
-        });
+        resolveTaskBuilderStub.onCall(1).resolves(ipv6records);
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
