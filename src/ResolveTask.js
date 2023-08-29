@@ -51,7 +51,6 @@ class ResolveTask extends EventEmitter {
         this._resolver =
             ipVersion === ResolveTask.IPv4 ? resolver.resolve4 : resolver.resolve6;
 
-        // this._resolved = this._resolved.bind(this);
     }
 
     /**
@@ -91,35 +90,6 @@ class ResolveTask extends EventEmitter {
         this.emit('done');
     }
 
-    /**
-     * @param {Error} error
-     * @param {Address[]} addresses
-     * @emits ResolveTask#addresses array of addresses
-     * @emits ResolveTask#done notification about completion
-     * @private
-     */
-    // _resolved(error, addresses) {
-    //     assert(this._callbacks.length > 0, 'callbacks array cannot be empty.');
-    //
-    //     if (!error) {
-    //         assert(Array.isArray(addresses), 'addresses must be an array.');
-    //
-    //         addresses.forEach(address => {
-    //             address.family = this._ipVersion;
-    //             address.expiredTime = Date.now() + address.ttl * 1000;
-    //         });
-    //
-    //         this.emit('addresses', addresses);
-    //     }
-    //
-    //     this._callbacks.forEach(callback => {
-    //         setImmediate(() => callback(error, addresses));
-    //     });
-    //
-    //     this._callbacks = [];
-    //
-    //     this.emit('done');
-    // }
 }
 
 module.exports = ResolveTask;

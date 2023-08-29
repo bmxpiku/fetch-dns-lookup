@@ -5,7 +5,7 @@
 
 ```js
 import fetch from 'node-fetch';
-import { lookup } from 'lookup-dns-cache';
+import { lookup } from 'fetch-dns-lookup';
 
 // With "node-fetch" module
 const staticDnsAgent = () => new https.Agent({

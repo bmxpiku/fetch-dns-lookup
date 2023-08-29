@@ -151,7 +151,7 @@ describe('Unit: Lookup::_resolveBoth', () => {
     setOfOptions.forEach(options => {
         it(`must return error, cuz no data were found with ${JSON.stringify(
             options
-        )} options`, done => {
+        )} options`, async () => {
             const expectedError = new Error(`${dns.NOTFOUND} ${hostname}`);
             expectedError.hostname = hostname;
             expectedError.code = dns.NOTFOUND;
@@ -168,7 +168,7 @@ describe('Unit: Lookup::_resolveBoth', () => {
                 '_makeNotFoundError'
             );
 
-            lookup._resolveBoth(hostname, options, cbSpy);
+            await lookup._resolveBoth(hostname, options, cbSpy);
 
             setImmediate(() => {
                 assert.isTrue(resolveTaskBuilderStub.calledTwice);
@@ -215,8 +215,6 @@ describe('Unit: Lookup::_resolveBoth', () => {
                     cbSpy.getCall(0).args[0].errno,
                     expectedError.errno
                 );
-
-                done();
             });
         });
     });
@@ -348,7 +346,7 @@ describe('Unit: Lookup::_resolveBoth', () => {
         }, 30);
     });
 
-    it('must return IPv6 address that was found with {all: false} option', done => {
+    it('must return IPv6 address that was found with {all: false} option', async () => {
         const options = { all: false };
 
         const cbSpy = sinon.stub();
@@ -366,7 +364,7 @@ describe('Unit: Lookup::_resolveBoth', () => {
 
         const makeNotFoundErrorSpy = sinon.spy(lookup, '_makeNotFoundError');
 
-        lookup._resolveBoth(hostname, options, cbSpy);
+        await lookup._resolveBoth(hostname, options, cbSpy);
 
         setTimeout(() => {
             assert.isTrue(resolveTaskBuilderStub.calledTwice);
@@ -398,7 +396,6 @@ describe('Unit: Lookup::_resolveBoth', () => {
 
             assert.isTrue(makeNotFoundErrorSpy.notCalled);
 
-            done();
         }, 30);
     });
 });

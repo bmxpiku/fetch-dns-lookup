@@ -183,7 +183,7 @@ class Lookup {
      * @param {Function} callback
      * @private
      */
-    _innerResolve(hostname, ipVersion, callback) {
+    async _innerResolve(hostname, ipVersion, callback) {
         const key = `${hostname}_${ipVersion}`;
 
         const cachedAddresses = this._addressCache.find(key);
@@ -214,7 +214,7 @@ class Lookup {
             });
 
             task.addResolvedCallback(callback);
-            task.run();
+            await task.run();
         }
     }
 
@@ -228,7 +228,7 @@ class Lookup {
      */
     async _resolveBoth(hostname, options, callback) {
         try {
-            const [ipv4records, ipv6records] = await Promise.all([
+            let [ipv4records, ipv6records] = await Promise.all([
                 this._resolveTaskBuilder(
                     hostname,
                     Object.assign({}, options, { family: Lookup.IPv4 })
@@ -247,10 +247,18 @@ class Lookup {
                 }
 
                 return callback(null, result);
-            } else if (ipv4records.length > 0) {
-                return callback(null, ...ipv4records);
-            } else if (ipv6records.length > 0) {
-                return callback(null, ...ipv6records);
+            } else if ((typeof ipv4records === 'string' && ipv4records)
+                || (Array.isArray(ipv4records) && ipv4records.length > 0)) {
+                if (Array.isArray(ipv4records)) {
+                    ipv4records = ipv4records[0];
+                }
+                return callback(null, ipv4records, 4);
+            } else if ((typeof ipv6records === 'string' && ipv6records)
+                || (Array.isArray(ipv6records) && ipv6records.length > 0)) {
+                if (Array.isArray(ipv6records)) {
+                    ipv6records = ipv6records[0];
+                }
+                return callback(null, ipv6records, 6);
             }
 
             return callback(this._makeNotFoundError(hostname));
