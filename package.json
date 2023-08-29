@@ -1,6 +1,6 @@
 {
   "name": "fetch-dns-lookup",
-  "version": "3.0.0",
+  "version": "3.0.5",
   "description": "An implementation to speed up the nodejs `dns.lookup` method by avoiding thread pool and using tangerine library",
   "main": "index.js",
   "engines": {
