@@ -1,3 +1,15 @@
+# v3.0.6 (Tue Aug 29 2023)
+
+#### ⚠️ Pushed to `master`
+
+- Fix for backward test compability ([@bmxpiku](https://github.com/bmxpiku))
+
+#### Authors: 1
+
+- Piotr Kurek ([@bmxpiku](https://github.com/bmxpiku))
+
+---
+
 # v3.0.5 (Tue Aug 29 2023)
 
 #### ⚠️ Pushed to `master`
