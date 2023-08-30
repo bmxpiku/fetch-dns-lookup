@@ -28,12 +28,28 @@ let dohdec;
 let isPrivateIP;
 // eslint-disable-next-line unicorn/prefer-top-level-await
 (async () => {
-    try {
-        dohdec = await import('dohdec');
-        isPrivateIP = await import('private-ip');
-        isPrivateIP = isPrivateIP.default;
-    } catch (e) {}
+    // dohdec = await import('dohdec');
+    // isPrivateIP = await import('private-ip');
+    // isPrivateIP = isPrivateIP.default;
+    return new Promise((resolve, reject) => {
+        import('dohdec').then((obj) => {
+            dohdec = obj;
+            resolve();
+        }).catch((err) => console.error(err));
+    })
 })();
+(async () => {
+    // dohdec = await import('dohdec');
+    // isPrivateIP = await import('private-ip');
+    // isPrivateIP = isPrivateIP.default;
+    return new Promise((resolve, reject) => {
+        import('private-ip').then((obj) => {
+            isPrivateIP = obj.default;
+            resolve();
+        }).catch((err) => console.error(err));
+    })
+})();
+
 
 const HOSTFILE = hostile
     .get(true)
