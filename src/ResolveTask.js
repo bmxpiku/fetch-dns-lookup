@@ -9,7 +9,7 @@
  */
 
 const assert = require('assert');
-const Tangerine = require('tangerine');
+const Tangerine = require('./tangerine');
 const { EventEmitter } = require('events');
 
 class ResolveTask extends EventEmitter {
