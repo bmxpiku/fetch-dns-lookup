@@ -9,7 +9,7 @@
  */
 
 const assert = require('assert');
-const Tangerine = require('tangerine');
+const dns = require('dns/promises');
 const { EventEmitter } = require('events');
 
 class ResolveTask extends EventEmitter {
@@ -47,9 +47,8 @@ class ResolveTask extends EventEmitter {
         this._callbacks = [];
         this._hostname = hostname;
         this._ipVersion = ipVersion;
-        const resolver = new Tangerine();
         this._resolver =
-            ipVersion === ResolveTask.IPv4 ? resolver.resolve4 : resolver.resolve6;
+            ipVersion === ResolveTask.IPv4 ? dns.resolve4 : dns.resolve6;
 
     }
 
